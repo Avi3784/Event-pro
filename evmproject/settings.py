@@ -133,9 +133,6 @@ RAZORPAY_API_KEY = os.environ.get('RAZORPAY_API_KEY', 'razorpay_api_key')
 RAZORPAY_API_SECRET = os.environ.get('RAZORPAY_API_SECRET', 'razorpay_api_secret')
 RAZORPAY_WEBHOOK_SECRET = os.environ.get('RAZORPAY_WEBHOOK_SECRET', '')
 
-UPI_VPA = os.environ.get('UPI_VPA', '5678987654')
-UPI_NAME = os.environ.get('UPI_NAME', 'Aviral')
-UPI_NOTE = os.environ.get('UPI_NOTE', 'Event Payment')
 
 # --- CSRF SETTINGS ---
 CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com', 'http://127.0.0.1:8000', 'http://localhost:8000']
