@@ -70,7 +70,11 @@ Event-pro is a comprehensive Django-based web application designed to streamline
     ```bash
     python manage.py runserver
     ```
-
+7. **Admin login:**
+   ```bash
+   Username:admin
+   Password:admin123
+   ```
 
 ## Usage
 
