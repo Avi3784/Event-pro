@@ -1,0 +1,193 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Management Pro</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'blue_hrms/assets/css/line-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'blue_hrms/assets/css/font-awesome.min.css' %}">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'blue_hrms/assets/css/bootstrap.min.css' %}"> 
+    
+    <style>
+        body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; overflow: hidden; /* Important for layout */ }
+        a { text-decoration: none !important; }
+        
+        /* HIDE SCROLLBAR (Clean Look) */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* SCROLL PROGRESS */
+        #scroll-progress {
+            position: fixed; top: 0; left: 0; height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+            width: 0%; z-index: 100000; transition: width 0.1s;
+        }
+
+        /* PRELOADER */
+        #preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #0f172a; z-index: 99999;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.5s ease-out, visibility 0.5s;
+        }
+        .loader-logo { font-size: 3rem; color: white; font-weight: 800; animation: pulseLogo 2s infinite; }
+        @keyframes pulseLogo { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(0.95); opacity: 0.7; } }
+
+        /* SIDEBAR STYLE */
+        .sidebar-premium { background: #0f172a; border-right: 1px solid #1e293b; z-index: 60; }
+        
+        .nav-item { position: relative; overflow: hidden; border-radius: 12px; transition: all 0.3s; }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.08); transform: translateX(5px); }
+        
+        /* ANIMATION UTILS */
+        .page-enter { animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(30px); }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+        .swal-overlay, .sweet-alert, .modal { z-index: 100001 !important; }
+        .magnetic-btn { display: inline-block; transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+
+<body class="antialiased text-slate-800">
+
+    <div id="scroll-progress"></div>
+    <div id="preloader"><div class="loader-logo">EventPro<span class="text-blue-500">.</span></div></div>
+
+    <div class="d-flex h-screen w-full overflow-hidden" id="wrapper">
+        
+        <div class="sidebar-premium w-64 hidden md:flex flex-col flex-shrink-0 shadow-2xl h-full">
+            
+            <div class="p-6 flex-shrink-0">
+                <div class="flex items-center gap-3 group cursor-pointer">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform duration-500 group-hover:rotate-12">
+                        <i class="la la-bolt text-white text-2xl"></i>
+                    </div>
+                    <h1 class="text-2xl font-extrabold text-white tracking-tight group-hover:text-blue-400 transition-colors">EventPro</h1>
+                </div>
+            </div>
+            
+            <nav class="flex-1 min-h-0 overflow-y-auto no-scrollbar px-4 space-y-1">
+                <p class="px-2 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2 mt-2">Main Menu</p>
+                
+                <a href="{% url 'home' %}" class="nav-item flex items-center p-3 text-slate-300 rounded-xl group">
+                    <i class="la la-home text-2xl mr-3 text-slate-400 transition group-hover:text-blue-400"></i> <span class="font-medium tracking-wide">Home</span>
+                </a>
+                <a href="{% url 'bookticket' %}" class="nav-item flex items-center p-3 text-slate-300 rounded-xl group">
+                    <i class="la la-ticket text-2xl mr-3 text-slate-400 transition group-hover:text-blue-400"></i> <span class="font-medium tracking-wide">Book Tickets</span>
+                </a>
+                <a href="{% url 'my_bookings' %}" class="nav-item flex items-center p-3 text-slate-300 rounded-xl group">
+                    <i class="la la-history text-2xl mr-3 text-slate-400 transition group-hover:text-blue-400"></i> <span class="font-medium tracking-wide">My Tickets</span>
+                </a>
+
+                {% if user.is_authenticated and user.is_superuser %}
+                <div class="mt-6 pt-4 border-t border-slate-700/50">
+                    <p class="px-2 text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] mb-2">Admin Control</p>
+                    <a href="{% url 'dashboard' %}" class="nav-item flex items-center p-3 text-slate-300 rounded-xl group"><i class="la la-dashboard text-2xl mr-3 text-slate-400"></i> <span>Dashboard</span></a>
+                    <a href="{% url 'addevent' %}" class="nav-item flex items-center p-3 text-slate-300 rounded-xl group"><i class="la la-plus-circle text-2xl mr-3 text-slate-400"></i> <span>Add Event</span></a>
+                    <a href="{% url 'view_volunteers' %}" class="nav-item flex items-center p-3 text-slate-300 rounded-xl group"><i class="la la-users text-2xl mr-3 text-slate-400"></i> <span>Volunteers</span></a>
+                    
+                    <a href="/admin/evmapp/booking/" target="_blank" class="mt-3 flex items-center p-3 rounded-xl bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 text-blue-300 hover:bg-blue-600 hover:text-white transition-all duration-300 group relative overflow-hidden">
+                        <div class="absolute inset-0 bg-blue-500/20 blur-md group-hover:animate-pulse"></div>
+                        <i class="la la-check-circle text-2xl mr-3 relative z-10"></i> <span class="font-bold relative z-10">Verify</span>
+                    </a>
+                </div>
+                {% endif %}
+                
+                <div class="h-8"></div>
+            </nav>
+
+            <div class="p-4 border-t border-slate-800 bg-slate-900/90 backdrop-blur flex-shrink-0 z-20">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}" class="flex items-center justify-center w-full p-3 bg-red-600/10 text-red-400 hover:bg-red-600 hover:text-white rounded-xl transition-all duration-300 border border-red-500/20 shadow-lg hover:shadow-red-500/40 magnetic-btn">
+                        <i class="la la-power-off text-xl mr-2"></i> <span class="font-bold">Log Out</span>
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="flex items-center justify-center w-full p-3 bg-slate-800 text-slate-300 hover:bg-white hover:text-slate-900 rounded-xl transition-all duration-300 border border-slate-700 hover:-translate-y-1 magnetic-btn">
+                        <i class="la la-lock text-xl mr-2"></i> <span class="font-bold">Admin Login</span>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="flex-1 h-full overflow-y-auto overflow-x-hidden relative w-full bg-[#f8fafc] scroll-container">
+            
+            <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-white/50 shadow-sm px-8 py-4 flex justify-between items-center w-full">
+                <div class="flex items-center gap-2">
+                    {% if user.is_authenticated %}
+                        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div><h2 class="text-sm font-bold text-slate-700">Hi, {{ user.username }}</h2>
+                    {% else %}
+                        <div class="w-2 h-2 rounded-full bg-slate-400"></div><h2 class="text-sm font-bold text-slate-700">Guest Mode</h2>
+                    {% endif %}
+                </div>
+                <button onclick="showSupport()" class="flex-shrink-0 group flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-full text-xs font-bold text-slate-600 hover:border-blue-500 hover:text-blue-600 transition-colors shadow-sm magnetic-btn">
+                    <i class="la la-headset text-lg group-hover:rotate-12 transition-transform"></i> Help
+                </button>
+            </div>
+
+            <div class="p-6 md:p-10 pb-24">
+                {% block content %}{% endblock %}
+            </div>
+
+            <footer class="p-8 text-center text-slate-400 text-xs font-medium border-t border-slate-200/60 mt-auto">
+                &copy; 2025 EventPro. Crafted with Passion.
+            </footer>
+        </div>
+    </div>
+
+    <script src="{% static 'blue_hrms/assets/js/jquery-3.2.1.min.js' %}"></script>
+    <script src="{% static 'blue_hrms/assets/js/bootstrap.min.js' %}"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script> 
+
+    <script>
+        // Smooth Scroll
+        const scrollContainer = document.querySelector('.scroll-container');
+        const lenis = new Lenis({ duration: 1.2, wrapper: scrollContainer, content: scrollContainer });
+        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+        requestAnimationFrame(raf);
+
+        // Scroll Progress Bar
+        scrollContainer.addEventListener('scroll', () => {
+            let winScroll = scrollContainer.scrollTop;
+            let height = scrollContainer.scrollHeight - scrollContainer.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("scroll-progress").style.width = scrolled + "%";
+        });
+
+        // Magnetic Buttons
+        document.querySelectorAll('.magnetic-btn').forEach(btn => {
+            btn.addEventListener('mousemove', function(e) {
+                const pos = btn.getBoundingClientRect();
+                const x = e.clientX - pos.left - pos.width / 2;
+                const y = e.clientY - pos.top - pos.height / 2;
+                btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+            });
+            btn.addEventListener('mouseleave', function() { btn.style.transform = 'translate(0px, 0px)'; });
+        });
+
+        // Init
+        AOS.init({ duration: 1000, once: true, offset: 50 });
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                const pre = document.getElementById('preloader');
+                pre.style.opacity = '0';
+                setTimeout(() => pre.style.visibility = 'hidden', 500);
+            }, 800);
+        });
+
+        function showSupport() { swal({ title: "Support Team", text: "Direct Line: +91 8400776701\nEmail: aviralbhargava30@gmail.com", icon: "info" }); }
+        {% for message in messages %} swal("Update", "{{ message }}", "{{ message.tags }}"); {% endfor %}
+    </script>
+</body>
+</html>

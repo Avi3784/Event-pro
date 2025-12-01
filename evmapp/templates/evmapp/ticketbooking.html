@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-10 relative">
+    
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
+        <div class="absolute top-10 left-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-pulse"></div>
+        <div class="absolute bottom-10 right-10 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-pulse" style="animation-delay: 2s"></div>
+    </div>
+
+    <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8" data-aos="fade-up">
+        
+        <div class="lg:col-span-8 bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+            <div class="p-8 border-b border-slate-100 bg-slate-50/50">
+                <h2 class="text-2xl font-extrabold text-slate-800 flex items-center gap-2">
+                    <i class="la la-ticket text-blue-600"></i> Reserve Your Seat
+                </h2>
+            </div>
+            
+            <div class="p-8">
+                <form method="POST" class="space-y-6" id="bookingForm">
+                    {% csrf_token %}
+                    
+                    <div class="group">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Select Experience</label>
+                        <div class="relative">
+                            <select name="event" id="eventSelect" class="w-full px-4 py-4 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 font-medium focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition appearance-none cursor-pointer" required onchange="updatePrice()">
+                                <option value="" disabled selected>Choose an event...</option>
+                                {% for event in events %}
+                                    <option value="{{ event.id }}" data-price="{{ event.price_per_ticket }}" data-name="{{ event.event_name }}">
+                                        {{ event.event_name }} 
+                                        ({% if event.free_ticket %}Free{% else %}₹{{ event.price_per_ticket }}{% endif %})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-500"><i class="la la-angle-down text-xl"></i></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Full Name</label>
+                            <input type="text" name="name" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition bg-white" placeholder="Alex" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Phone Number</label>
+                            <input type="tel" name="contact_number" 
+                                   class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition bg-white" 
+                                   placeholder="9876543210" 
+                                   maxlength="10" 
+                                   minlength="10" 
+                                   pattern="[0-9]{10}"
+                                   title="Please enter exactly 10 digits"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+                                   required>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Email</label>
+                        <input type="email" name="email" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition bg-white" placeholder="alex@example.com" required>
+                    </div>
+
+                    <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="flex items-center gap-4">
+                            <label class="text-sm font-bold text-blue-900">Quantity</label>
+                            <div class="flex items-center bg-white rounded-lg border border-blue-200">
+                                <button type="button" onclick="changeQty(-1)" class="px-3 py-1 text-blue-600 hover:bg-blue-50 rounded-l-lg"><i class="la la-minus"></i></button>
+                                <input type="number" name="number_of_tickets" id="ticketCount" value="1" min="1" max="10" class="w-12 text-center border-0 font-bold text-slate-800 focus:ring-0" readonly>
+                                <button type="button" onclick="changeQty(1)" class="px-3 py-1 text-blue-600 hover:bg-blue-50 rounded-r-lg"><i class="la la-plus"></i></button>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs text-blue-400 font-bold uppercase tracking-wide">Total</p>
+                            <p class="text-3xl font-black text-blue-700 transition-all" id="totalDisplay">₹0</p>
+                        </div>
+                    </div>
+
+                    <button type="button" id="bookBtn" onclick="submitWithConfetti()" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl shadow-lg hover:shadow-blue-500/50 hover:-translate-y-1 transition-all duration-300 text-lg flex items-center justify-center gap-2">
+                        Proceed <i class="la la-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="lg:col-span-4">
+            <div class="bg-slate-900 text-white rounded-3xl p-8 shadow-2xl sticky top-24">
+                <div class="mb-6"><span class="bg-white/10 px-3 py-1 rounded-full text-xs font-bold tracking-widest text-blue-300 border border-white/10">SUMMARY</span></div>
+                <h3 class="text-2xl font-bold mb-2" id="summaryEventName">Select an Event</h3>
+                <div class="space-y-4 border-t border-slate-700 pt-6">
+                    <div class="flex justify-between text-sm"><span class="text-slate-400">Price</span><span class="font-mono" id="summaryBasePrice">-</span></div>
+                    <div class="flex justify-between text-sm"><span class="text-slate-400">Qty</span><span class="font-mono" id="summaryQty">1</span></div>
+                    <div class="flex justify-between text-lg font-bold text-white pt-4 border-t border-slate-700"><span>Total</span><span class="text-green-400" id="summaryTotal">-</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+    function submitWithConfetti() {
+        const form = document.getElementById('bookingForm');
+        const btn = document.getElementById('bookBtn');
+        if (!form.checkValidity()) { form.reportValidity(); return; }
+
+        var count = 200, defaults = { origin: { y: 0.7 } };
+        function fire(ratio, opts) { confetti(Object.assign({}, defaults, opts, { particleCount: Math.floor(count * ratio) })); }
+        fire(0.25, { spread: 26, startVelocity: 55 });
+        fire(0.2, { spread: 60 });
+        fire(0.1, { spread: 120, startVelocity: 45 });
+
+        btn.innerHTML = '<i class="la la-spinner la-spin"></i> Processing...';
+        btn.classList.add('opacity-75', 'cursor-not-allowed');
+        
+        setTimeout(() => { form.submit(); }, 1200);
+    }
+
+    function changeQty(amount) {
+        const input = document.getElementById('ticketCount');
+        let val = parseInt(input.value) + amount;
+        if (val >= 1 && val <= 10) { input.value = val; updatePrice(); }
+    }
+
+    function updatePrice() {
+        const select = document.getElementById('eventSelect');
+        const countInput = document.getElementById('ticketCount');
+        const display = document.getElementById('totalDisplay');
+        const sumName = document.getElementById('summaryEventName');
+        const sumBase = document.getElementById('summaryBasePrice');
+        const sumQty = document.getElementById('summaryQty');
+        const sumTotal = document.getElementById('summaryTotal');
+        
+        if (select.selectedIndex > 0) {
+            const option = select.options[select.selectedIndex];
+            const price = parseFloat(option.getAttribute('data-price')) || 0;
+            const name = option.getAttribute('data-name') || "Event";
+            const count = parseInt(countInput.value) || 1;
+            const total = price * count;
+            
+            display.innerText = total === 0 ? "Free" : "₹" + total;
+            sumName.innerText = name;
+            sumBase.innerText = total === 0 ? "Free" : "₹" + price;
+            sumQty.innerText = count;
+            sumTotal.innerText = total === 0 ? "Free" : "₹" + total;
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = urlParams.get('event');
+        if (eventId) { document.getElementById('eventSelect').value = eventId; updatePrice(); }
+    });
+</script>
+{% endblock %}

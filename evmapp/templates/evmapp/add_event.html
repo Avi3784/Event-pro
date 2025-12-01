@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+    #map-container {
+        position: relative;
+        height: 300px;
+        margin-bottom: 20px;
+    }
+    #map {
+        height: 100%;
+        width: 100%;
+        border-radius: 4px;
+    }
+    .map-search-box {
+        margin-bottom: 10px;
+    }
+    .location-details {
+        margin-top: 10px;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content container-fluid">
+    <div class="page-header">
+        <div class="row">
+            <div class="col-sm-12">
+                <h3 class="page-title">Manage Events</h3>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item active">Add Events</li>
+                </ul>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label">Event Name</label>
+                                    <div class="col-lg-9">
+                                        <input type="text" name="event_name" class="form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label">Category</label>
+                                    <div class="col-lg-9">
+                                        <select name="category" class="form-control" required>
+                                            <option value="CONFERENCE">Conference</option>
+                                            <option value="WORKSHOP">Workshop</option>
+                                            <option value="SEMINAR">Seminar</option>
+                                            <option value="CULTURAL">Cultural Event</option>
+                                            <option value="SPORTS">Sports Event</option>
+                                            <option value="CONCERT">Concert</option>
+                                            <option value="EXHIBITION">Exhibition</option>
+                                            <option value="NETWORKING">Networking Event</option>
+                                            <option value="OTHER">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label">Organiser Name</label>
+                                    <div class="col-lg-9">
+                                        <input type="text" name="organiser_name" class="form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label">Time</label>
+                                    <div class="col-lg-9">
+                                        <input type="time" name="time" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label">Date</label>
+                                    <div class="col-lg-9">
+                                        <input type="date" name="date" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label">Theme</label>
+                                    <div class="col-lg-9">
+                                        <input type="text" name="theme" class="form-control" placeholder="Event theme or tagline" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label">Venue</label>
+                                    <div class="col-lg-9">
+                                        <input type="text" id="venue-input" name="venue" class="form-control" placeholder="Venue address or name" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Group discount removed -->
+                            <div class="col-xl-6">
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label">Add a short Event Description</label>
+                                    <div class="col-lg-9">
+                                        <textarea name="description" class="form-control" placeholder="eg: Fun Activites Followed by Dinner, Bring Your Friends and Family along!" rows="3" required></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <h4 class="card-title mb-4 border-bottom pb-2">Sponsor Details</h4>
+                        <div id="sponsor-details">
+                            <!-- Sponsor details inputs -->
+                            <div class="sponsor mb-4">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group row">
+                                            <label class="col-lg-3 col-form-label">Sponsor Name</label>
+                                            <div class="col-lg-9">
+                                                <input type="text" name="sponsor_name[]" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-lg-3 col-form-label">Purpose</label>
+                                            <div class="col-lg-9">
+                                                <input type="text" name="purpose[]" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6">
+                                        <div class="form-group row">
+                                            <label class="col-lg-3 col-form-label">Contact Number</label>
+                                            <div class="col-lg-9">
+                                                <input type="text" name="contact[]" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-lg-3 col-form-label">Cost</label>
+                                            <div class="col-lg-9">
+                                                <input type="number" name="cost[]" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-primary mb-4" id="add-sponsor">Click To Add Additional Sponsors</button>
+                        
+                        <h4 class="card-title mb-4 border-bottom pb-2">Ticketing Details</h4>
+                        <div class="row">
+                            <div class="col-xl-6">
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label">Total Number of Tickets</label>
+                                    <div class="col-lg-9">
+                                        <input type="number" name="total_tickets" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label">Price per Ticket</label>
+                                    <div class="col-lg-9">
+                                        <input type="number" name="price_per_ticket" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xl-6">
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label">Free Ticket?</label>
+                                    <div class="col-lg-9">
+                                        <input type="checkbox" name="free_ticket" class="form-check-input" id="free-ticket-checkbox">
+                                        <label class="form-check-label" for="free-ticket-checkbox">Yes, this event has free tickets</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    
+    
+
+</div>
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Sponsor functionality
+        const addSponsorButton = document.getElementById('add-sponsor');
+        const sponsorDetailsContainer = document.getElementById('sponsor-details');
+        
+        addSponsorButton.addEventListener('click', function() {
+            const clonedSponsor = document.querySelector('.sponsor').cloneNode(true);
+            const clonedInputs = clonedSponsor.querySelectorAll('input');
+            clonedInputs.forEach(input => {
+                input.value = '';
+            });
+            sponsorDetailsContainer.appendChild(clonedSponsor);
+        });
+
+        // No map: only sponsor add-clone behaviour remains
+    });
+</script>
+
+
+{% endblock  %}

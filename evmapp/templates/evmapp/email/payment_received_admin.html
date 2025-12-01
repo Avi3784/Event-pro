@@ -1,0 +1,10 @@
+<!doctype html>
+<html>
+  <body>
+    <p>Admin,</p>
+    <p>User <strong>{{ booking.name }}</strong> marked booking <strong>{{ booking.ticket_id }}</strong> as paid for event <strong>{{ booking.event.event_name }}</strong>.</p>
+    <p>Amount: ₹{{ booking.total_cost }}</p>
+    <p>Reference: {{ booking.payment_ref }}</p>
+    <p>Check screenshot (if uploaded) in the admin panel and verify.</p>
+  </body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Payment Verified</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+        .container { width: 100%; max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background-color: #28a745; padding: 20px; text-align: center; color: white; }
+        .content { padding: 30px; color: #333; line-height: 1.6; }
+        .ticket-box { border: 2px dashed #28a745; background-color: #f9fff9; padding: 20px; margin: 20px 0; text-align: center; border-radius: 8px; }
+        .ticket-id { font-size: 24px; font-weight: bold; color: #28a745; letter-spacing: 2px; margin: 10px 0; display: block; }
+        .details-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .details-table td { padding: 10px; border-bottom: 1px solid #eee; }
+        .footer { background-color: #eeeeee; padding: 15px; text-align: center; font-size: 12px; color: #777; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 style="margin:0;">Booking Confirmed</h1>
+        </div>
+        <div class="content">
+            <p>Hi <strong>{{ booking.name }}</strong>,</p>
+            <p>Great news! We have verified your payment. Your spot for <strong>{{ booking.event.event_name }}</strong> is secured.</p>
+
+            <div class="ticket-box">
+                <span>YOUR TICKET ID</span>
+                <span class="ticket-id">{{ booking.ticket_id }}</span>
+                <small>Please show this ID at the entrance.</small>
+            </div>
+
+            <table class="details-table">
+                <tr>
+                    <td><strong>Event:</strong></td>
+                    <td>{{ booking.event.event_name }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Date:</strong></td>
+                    <td>{{ booking.event.date }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Time:</strong></td>
+                    <td>{{ booking.event.time }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Venue:</strong></td>
+                    <td>{{ booking.event.venue }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Transaction Ref:</strong></td>
+                    <td>{{ booking.payment_ref }}</td>
+                </tr>
+            </table>
+
+            <p style="margin-top: 20px;">We look forward to seeing you there!</p>
+        </div>
+        <div class="footer">
+            <p>&copy; Event Management Team. Need help? Reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto" data-aos="fade-in">
+    
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h2 class="text-3xl font-bold text-slate-800">Volunteer Force</h2>
+            <p class="text-slate-500 mt-1">Manage your event heroes.</p>
+        </div>
+        <a href="{% url 'add_volunteer' %}" class="px-6 py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 hover:shadow-blue-500/30 hover:-translate-y-1 transition-all flex items-center gap-2">
+            <i class="la la-plus-circle text-xl"></i> Recruit New
+        </a>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                        <th class="py-5 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Volunteer</th>
+                        <th class="py-5 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Role</th>
+                        <th class="py-5 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Contacts</th>
+                        <th class="py-5 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Status Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for vol in volunteers %}
+                    <tr class="hover:bg-blue-50/50 transition-colors duration-200 group">
+                        <td class="py-4 px-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 text-white flex items-center justify-center font-bold text-sm shadow-sm">
+                                    {{ vol.first_name|slice:":1" }}{{ vol.last_name|slice:":1" }}
+                                </div>
+                                <div>
+                                    <p class="font-bold text-slate-800">{{ vol.first_name }} {{ vol.last_name }}</p>
+                                    <p class="text-xs text-slate-400">Joined: {{ vol.created_at|date:"M d" }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-4 px-6">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">
+                                {{ vol.volunteer_role }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-6">
+                            <div class="text-sm text-slate-600 flex flex-col gap-1">
+                                <span class="flex items-center gap-2"><i class="la la-phone text-slate-400"></i> {{ vol.phone }}</span>
+                                <span class="flex items-center gap-2"><i class="la la-envelope text-slate-400"></i> {{ vol.email }}</span>
+                            </div>
+                        </td>
+                        <td class="py-4 px-6 text-center">
+                            <form method="POST" action="{% url 'update_volunteer_status' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="volunteer_id" value="{{ vol.id }}">
+                                
+                                <div class="relative inline-block">
+                                    <select name="status" onchange="this.form.submit()" class="appearance-none cursor-pointer pl-3 pr-8 py-1.5 rounded-full text-xs font-bold border-2 focus:outline-none focus:ring-2 focus:ring-offset-1 transition-all
+                                        {% if vol.status == 'Active' %}
+                                            bg-green-50 border-green-200 text-green-700 hover:border-green-400 focus:ring-green-500
+                                        {% elif vol.status == 'Pending' %}
+                                            bg-yellow-50 border-yellow-200 text-yellow-700 hover:border-yellow-400 focus:ring-yellow-500
+                                        {% else %}
+                                            bg-red-50 border-red-200 text-red-700 hover:border-red-400 focus:ring-red-500
+                                        {% endif %}">
+                                        <option value="Pending" {% if vol.status == 'Pending' %}selected{% endif %}> Pending</option>
+                                        <option value="Active" {% if vol.status == 'Active' %}selected{% endif %}> Active</option>
+                                        <option value="Inactive" {% if vol.status == 'Inactive' %}selected{% endif %}> Inactive</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
+                                        <i class="la la-angle-down text-xs"></i>
+                                    </div>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="py-12 text-center text-slate-400">
+                            <div class="flex flex-col items-center">
+                                <i class="la la-user-plus text-4xl mb-2 opacity-50"></i>
+                                <p>No volunteers have applied yet.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

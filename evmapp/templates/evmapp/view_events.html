@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto" data-aos="fade-in">
+    
+    <div class="flex justify-between items-end mb-8">
+        <div>
+            <h1 class="text-4xl font-black text-slate-900">Event Repository</h1>
+            <p class="text-slate-500 mt-2">Manage details, edit listings, and track attendees.</p>
+        </div>
+        <div class="text-right">
+            <p class="text-xs font-bold text-slate-400 uppercase">Total Tickets Sold</p>
+            <p class="text-3xl font-black text-blue-600">{{ total_tickets_sold }}</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6">
+        {% for event in events %}
+        <div class="group bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 flex flex-col md:flex-row items-center gap-6">
+            
+            <div class="flex-shrink-0 w-24 h-24 bg-slate-50 rounded-2xl flex flex-col items-center justify-center border border-slate-200">
+                <span class="text-xs font-bold text-slate-400 uppercase">{{ event.date|date:"M" }}</span>
+                <span class="text-3xl font-black text-slate-800">{{ event.date|date:"d" }}</span>
+            </div>
+
+            <div class="flex-grow text-center md:text-left">
+                <div class="flex items-center justify-center md:justify-start gap-3 mb-2">
+                    <span class="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold rounded-full uppercase tracking-wide">{{ event.category }}</span>
+                    {% if event.status %}
+                        <span class="flex items-center gap-1 text-[10px] font-bold text-green-600"><div class="w-2 h-2 rounded-full bg-green-500"></div> Active</span>
+                    {% else %}
+                        <span class="flex items-center gap-1 text-[10px] font-bold text-red-600"><div class="w-2 h-2 rounded-full bg-red-500"></div> Inactive</span>
+                    {% endif %}
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900 mb-1">{{ event.event_name }}</h3>
+                <p class="text-slate-500 text-sm"><i class="la la-map-marker mr-1"></i> {{ event.venue }}</p>
+            </div>
+
+            <div class="flex-shrink-0 text-center px-6 border-l border-slate-100 hidden md:block">
+                <p class="text-xs font-bold text-slate-400 uppercase">Price</p>
+                <p class="text-xl font-bold text-slate-800">{% if event.free_ticket %}Free{% else %}₹{{ event.price_per_ticket }}{% endif %}</p>
+            </div>
+
+            <div class="flex-shrink-0 flex gap-3">
+                <a href="{% url 'edit_event' event.id %}" class="w-12 h-12 rounded-xl bg-slate-100 text-slate-500 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center text-xl transition" title="Edit Event">
+                    <i class="la la-pencil"></i>
+                </a>
+                
+                <a href="{% url 'event_detail' event.id %}" class="px-6 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-blue-600 transition shadow-lg flex items-center gap-2">
+                    Manage <i class="la la-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-200">
+            <h3 class="text-xl font-bold text-slate-400">No events created yet.</h3>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

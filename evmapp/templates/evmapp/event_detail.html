@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    
+    <div class="relative h-72 md:h-96 rounded-[2.5rem] overflow-hidden shadow-2xl mb-10 group">
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 scale-105"></div>
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
+        
+        <div class="absolute bottom-0 left-0 p-8 md:p-12 w-full bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent z-10 flex flex-col md:flex-row justify-between items-end">
+            <div>
+                <span class="px-4 py-1.5 bg-blue-500/20 backdrop-blur border border-blue-400/30 text-white text-xs font-bold rounded-full uppercase tracking-widest mb-4 inline-block shadow-lg">{{ event.category }}</span>
+                <h1 class="text-4xl md:text-6xl font-black text-white mb-3 leading-tight drop-shadow-lg">{{ event.event_name }}</h1>
+                <p class="text-blue-200 flex items-center gap-2 font-medium"><i class="la la-map-marker text-2xl"></i> {{ event.venue }}</p>
+            </div>
+
+            <a href="{% url 'download_event_csv' event.id %}" class="mb-2 px-6 py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-blue-50 transition shadow-lg flex items-center gap-2">
+                <i class="la la-download"></i> Download Guest List
+            </a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 relative">
+        
+        <div class="lg:col-span-2 space-y-8">
+            
+            <div class="bg-white rounded-3xl p-8 shadow-lg border border-slate-100 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-full -mr-10 -mt-10 z-0"></div>
+                <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2 relative z-10"><i class="la la-info-circle text-blue-500 text-2xl"></i> About Event</h3>
+                <p class="text-slate-600 leading-relaxed text-lg relative z-10">{{ event.description }}</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full bg-purple-50 flex items-center justify-center text-purple-600 text-3xl"><i class="la la-users"></i></div>
+                    <div><p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Sold</p><p class="text-2xl font-black text-slate-800">{{ total_tickets_sold }}</p></div>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full bg-green-50 flex items-center justify-center text-green-600 text-3xl"><i class="la la-ticket"></i></div>
+                    <div><p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Capacity</p><p class="text-2xl font-black text-slate-800">{{ event.total_tickets }}</p></div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl p-8 shadow-lg border border-slate-100">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800">Guest List</h3>
+                        <p class="text-xs text-slate-400">{{ bookings.count }} registered guests</p>
+                    </div>
+                </div>
+                
+                <div class="overflow-auto max-h-[500px] border rounded-xl border-slate-100">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="sticky top-0 bg-slate-50 z-10">
+                            <tr class="text-xs font-bold text-slate-500 uppercase border-b border-slate-200">
+                                <th class="py-4 px-6">Name</th>
+                                <th class="py-4 px-6">Ticket ID</th>
+                                <th class="py-4 px-6 text-right">Qty</th>
+                                <th class="py-4 px-6 text-right">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-slate-600 text-sm divide-y divide-slate-100 bg-white">
+                            {% for booking in bookings %}
+                            <tr class="hover:bg-blue-50/50 transition">
+                                <td class="py-4 px-6 font-medium text-slate-800">{{ booking.name }}</td>
+                                <td class="py-4 px-6 font-mono text-xs text-slate-500">{{ booking.ticket_id }}</td>
+                                <td class="py-4 px-6 text-right font-bold">{{ booking.number_of_tickets }}</td>
+                                <td class="py-4 px-6 text-right">
+                                    {% if booking.is_verified %}
+                                        <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-green-100 text-green-700 border border-green-200">
+                                            <i class="la la-check mr-1"></i> Paid
+                                        </span>
+                                    {% else %}
+                                        <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200">
+                                            <i class="la la-clock-o mr-1"></i> Pending
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="py-10 text-center text-slate-400">
+                                    <div class="flex flex-col items-center">
+                                        <i class="la la-user-times text-4xl mb-2 opacity-50"></i>
+                                        <p>No guests have booked yet.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-1">
+            <div class="bg-slate-900 text-white rounded-3xl p-8 shadow-2xl sticky top-24 z-10">
+                
+                <div class="mb-8 text-center">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Event Starts In</p>
+                    <div class="flex justify-center gap-3 text-center">
+                        <div><span class="text-3xl font-black block" id="days">00</span><span class="text-[10px] text-slate-500 uppercase">Days</span></div>
+                        <span class="text-2xl text-slate-600">:</span>
+                        <div><span class="text-3xl font-black block" id="hours">00</span><span class="text-[10px] text-slate-500 uppercase">Hrs</span></div>
+                        <span class="text-2xl text-slate-600">:</span>
+                        <div><span class="text-3xl font-black block" id="mins">00</span><span class="text-[10px] text-slate-500 uppercase">Min</span></div>
+                    </div>
+                </div>
+
+                <div class="space-y-4 mb-8 border-t border-slate-700 pt-6">
+                    <div class="flex justify-between"><span class="text-slate-400">Date</span> <span class="font-bold">{{ event.date }}</span></div>
+                    <div class="flex justify-between"><span class="text-slate-400">Time</span> <span class="font-bold">{{ event.time }}</span></div>
+                    <div class="flex justify-between"><span class="text-slate-400">Organizer</span> <span class="font-bold text-blue-400">{{ event.organiser }}</span></div>
+                </div>
+
+                <a href="{% url 'bookticket' %}?event={{ event.id }}" class="block w-full py-4 bg-white text-slate-900 rounded-xl font-black text-center text-lg hover:bg-blue-50 hover:scale-105 transition-all duration-300 shadow-lg">
+                    Book Ticket Now
+                </a>
+                
+                <p class="text-center text-xs text-slate-500 mt-4 flex justify-center items-center gap-1"><i class="la la-shield"></i> Secure Booking</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Timer
+    const eventDate = new Date("{{ event.date|date:'Y-m-d' }}T{{ event.time|time:'H:i:s' }}").getTime();
+    const timer = setInterval(function() {
+        const now = new Date().getTime();
+        const distance = eventDate - now;
+        
+        if (distance < 0) {
+            clearInterval(timer);
+            document.getElementById("days").innerHTML = "00";
+            return;
+        }
+
+        document.getElementById("days").innerText = Math.floor(distance / (1000 * 60 * 60 * 24));
+        document.getElementById("hours").innerText = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        document.getElementById("mins").innerText = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    }, 1000);
+</script>
+{% endblock %}
