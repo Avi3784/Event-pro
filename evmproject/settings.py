@@ -119,11 +119,11 @@ EMAIL_USE_SSL = True         # <--- Turn ON SSL
 EMAIL_TIMEOUT = 30
 
 # Credentials
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'aviralbhargava30@gmail.com')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'hkqd rfbm uott lfml')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'USE YOUR EMAIL HERE')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'USE YOUR EMAIL PASS HERE')
 
-DEFAULT_FROM_EMAIL = 'Event Management System <aviralbhargava30@gmail.com>'
-SERVER_EMAIL = 'aviralbhargava30@gmail.com'
+DEFAULT_FROM_EMAIL = 'Event Management System <USE YOUR EMAIL HERE>'
+SERVER_EMAIL = 'USE YOUR EMAIL HERE'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
